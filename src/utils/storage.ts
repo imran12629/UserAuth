@@ -29,7 +29,6 @@ export const storage = {
 
   saveUserDetails: async (user: any) => {
     try {
-      console.log("USERRRRRRR saveUserDetails",user)
       await AsyncStorage.setItem(STORAGE_KEYS.USER, JSON.stringify(user));
     } catch (err) {
       console.error('Error saving user details:', err);
@@ -39,7 +38,6 @@ export const storage = {
   getUserDetails: async () => {
     try {
       const user = await AsyncStorage.getItem(STORAGE_KEYS.USER);
-      console.log("USERRRRRRR getUserDetails",user)
       return user ? JSON.parse(user) : null;
     } catch (err) {
       console.error('Error loading user details:', err);
