@@ -38,7 +38,7 @@ type Props = {
   LeftIcon?: any;
   RightIcon?: any;
   onPress?: () => void;
-  secureTextEntry?:boolean;
+  secureTextEntry?: boolean;
 } & React.ComponentProps<typeof TextInput>;
 
 const Input = forwardRef<InputRef, Props>((props, ref) => {
@@ -52,7 +52,8 @@ const Input = forwardRef<InputRef, Props>((props, ref) => {
     focus: () => inputRef.current?.focus(),
     clear: () => inputRef.current?.clear(),
     getValue: () => props.value || '',
-    setValue: (val: string) => inputRef.current?.setNativeProps({ text: val }),
+    setValue: (val: string) =>
+      inputRef.current?.setNativeProps({ text: val }),
   }));
 
   const getBorderStyle = () => {
@@ -69,7 +70,10 @@ const Input = forwardRef<InputRef, Props>((props, ref) => {
     <View style={[styles.container, props.otherStyle]}>
       {props.label && <Text style={styles.label}>{props.label}</Text>}
 
-      <View style={[styles.inputWrapper, getBorderStyle()]}>
+      <View
+        style={[styles.inputWrapper, getBorderStyle()]}
+        testID="input-wrapper"
+      >
         <TextInput
           ref={inputRef}
           value={props.value}
@@ -84,10 +88,15 @@ const Input = forwardRef<InputRef, Props>((props, ref) => {
           editable={props.editable}
           {...props}
           secureTextEntry={hidePassword}
+          testID={props.testID ?? "text-input"}
         />
-       {props.secureTextEntry && (
-          <TouchableOpacity onPress={togglePasswordVisibility}  >
-           <Image
+
+        {props.secureTextEntry && (
+          <TouchableOpacity
+            onPress={togglePasswordVisibility}
+            testID="password-toggle"
+          >
+            <Image
               source={
                 !hidePassword
                   ? require('../../assets/icons/eye.png')
@@ -140,10 +149,9 @@ const styles = StyleSheet.create({
     color: COLORS.darkBlue,
     height: verticalScale(48),
   },
-  eye:
-  {
-    width:moderateScale(30),
-    height:moderateScale(30)
+  eye: {
+    width: moderateScale(30),
+    height: moderateScale(30),
   },
   errorText: {
     marginTop: verticalScale(4),

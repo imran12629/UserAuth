@@ -134,12 +134,10 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
       name,
       email,
       password,
-      isLoggedIn = false,
     }: {
       name: string;
       email: string;
       password: string;
-      isLoggedIn: boolean;
     }) => {
       try {
         const newUser: User = { name, email, password, isLoggedIn };
@@ -149,7 +147,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
           ? existingUsersRaw
           : [];
 
-        const updatedUsers = [...existingUsers, newUser];
+        const updatedUsers = [...existingUsers, {...newUser,isLoggedIn:false}];
 
         await storage.saveUserDetails(updatedUsers);
 

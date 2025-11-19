@@ -20,7 +20,7 @@ export const COLORS = {
 export const LABELS = {
   sign_in_to_your_account: 'Sign in to your Account',
   welcome_back: 'Welcome back',
-  dont_have_an_account:"Don't have an account",
+  dont_have_an_account:"Don't have an account?",
   sign_up_to_your_account:"Sign up to new account",
   please_fill_the_details:"Please fill the details",
   name:"Name",

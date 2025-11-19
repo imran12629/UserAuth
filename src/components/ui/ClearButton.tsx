@@ -30,6 +30,7 @@ const ClearButton: React.FC<ClearButtonProps> = ({
 }) => {
   return (
     <TouchableOpacity
+    testID='clear-button-container'
       onPress={onPress}
       disabled={disabled}
       style={[styles.button, buttonStyle]}>
