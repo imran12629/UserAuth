@@ -68,12 +68,12 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
   useEffect(() => {
     (async () => {
       const savedUser = await storage.getUserDetails();
-      const user = savedUser.find((user:User) => user.isLoggedIn === true);
+      const user = savedUser.find((user: User) => user.isLoggedIn === true);
 
       if (user?.isLoggedIn) {
         setUser(user);
       }
-      
+
       setLoading(false);
     })();
   }, []);
@@ -147,7 +147,10 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
           ? existingUsersRaw
           : [];
 
-        const updatedUsers = [...existingUsers, {...newUser,isLoggedIn:false}];
+        const updatedUsers = [
+          ...existingUsers,
+          { ...newUser, isLoggedIn: false },
+        ];
 
         await storage.saveUserDetails(updatedUsers);
 
@@ -170,6 +173,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
   );
 
   const logout = useCallback(async () => {
+    const savedUser = await storage.getUserDetails();
+    const updatedUsers = updateLoginStatus(savedUser, 'NA');
+    await storage.saveUserDetails(updatedUsers);
     setIsLoggedIn(false);
     await storage.clearSession();
     setUser(null);
