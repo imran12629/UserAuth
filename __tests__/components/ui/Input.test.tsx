@@ -36,11 +36,9 @@ describe('Input Component', () => {
     const eyeButton = getByTestId('password-toggle');
     const textInput = getByTestId('text-input');
 
-    // First press → password should be visible
     fireEvent.press(eyeButton);
     expect(textInput.props.secureTextEntry).toBe(false);
 
-    // Second press → hide again
     fireEvent.press(eyeButton);
     expect(textInput.props.secureTextEntry).toBe(true);
   });

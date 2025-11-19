@@ -9,17 +9,14 @@ import LoginScreen from '../../src/screens/auth/LoginScreen';
 import { FlashMessageComponent } from '../../src/components/ui/FlashMessage';
 import { BUTTON, ERROR, LABELS } from '../../src/utils/constants';
 
-// Mock navigation
 jest.mock('../../src/hooks/useAppNavigation', () => ({
   useStackNavigation: () => ({
     navigate: jest.fn(),
   }),
 }));
 
-// Mock Flash Message
 FlashMessageComponent.show = jest.fn();
 
-// Mock Auth Hook
 const mockLogin = jest.fn();
 jest.mock('../../src/hooks/useAuth', () => ({
   useAuth: () => ({
@@ -117,7 +114,6 @@ describe('LoginScreen', () => {
       fireEvent.press(getByText(BUTTON.login));
     });
 
-    // Loader should appear
     await waitFor(() => {
       expect(getByTestId('activity-indicator')).toBeTruthy();
     });

@@ -70,10 +70,10 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
       const savedUser = await storage.getUserDetails();
       const user = savedUser.find((user:User) => user.isLoggedIn === true);
 
-      if (user.isLoggedIn) {
+      if (user?.isLoggedIn) {
         setUser(user);
       }
-
+      
       setLoading(false);
     })();
   }, []);

@@ -34,11 +34,9 @@ describe('Button Component', () => {
   });
 
   it('shows ActivityIndicator when loading = true', () => {
-    const { getByRole, queryByTestId, toJSON } = render(
+    const { getByRole, queryByTestId, } = render(
       <Button title="Loading Text" onPress={() => {}} loading={true} />
     );
-
-    // expect(toJSON()).toMatchSnapshot();
 
     expect(getByRole('button')).toBeTruthy();
 
