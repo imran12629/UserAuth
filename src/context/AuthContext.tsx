@@ -10,8 +10,9 @@ import { ERROR, LABELS } from '../utils/constants';
 
 export interface User {
   name: string;
-  email?: string;
-  token?: string;
+  email: string;
+  password: string;
+  isLoggedIn: boolean;
 }
 
 interface AuthContextType {
@@ -27,7 +28,7 @@ interface AuthContextType {
     user?: User;
   }>;
 
-  signup: (data: { name: string; email: string; password: string }) => Promise<{
+  signup: (data: User) => Promise<{
     status: boolean;
     message: string;
   }>;
@@ -66,46 +67,59 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
 
   useEffect(() => {
     (async () => {
-      const session = await storage.getUserSession();
       const savedUser = await storage.getUserDetails();
+      const user = savedUser.find((user:User) => user.isLoggedIn === true);
 
-      if (session.isLoggedIn) {
-        setUser(savedUser);
+      if (user.isLoggedIn) {
+        setUser(user);
       }
 
       setLoading(false);
     })();
   }, []);
 
+  const updateLoginStatus = (users: User[], emailToLogin: string) => {
+    return users.map(
+      user =>
+        user.email === emailToLogin
+          ? { ...user, isLoggedIn: true } // update this user
+          : { ...user, isLoggedIn: false }, // optional: logout others
+    );
+  };
+
   const login = useCallback(async (email: string, password: string) => {
     try {
-      const savedUser = await storage.getUserDetails();
-      const savedPassword = await storage.getEncryptedPassword();
+      const savedUsers = await storage.getUserDetails();
+      const users = Array.isArray(savedUsers) ? savedUsers : [];
+      const user = users.find(u => u.email === email);
 
-      if (!savedUser || !savedPassword) {
+      if (!user) {
         return { status: false, message: LABELS.login_user_does_not_exist };
       }
+      const savedPassword = await storage.getEncryptedPassword(email);
 
-      if (savedUser.email !== email) {
-        return {
-          status: false,
-          message: ERROR.email.wrong,
-        };
+      if (!savedPassword) {
+        return { status: false, message: ERROR.password.incorrect_password };
       }
+
       if (savedPassword !== password) {
         return {
           status: false,
           message: ERROR.password.incorrect_password,
         };
       }
+
+      const updatedUsers = updateLoginStatus(users, user.email);
+      await storage.saveUserDetails(updatedUsers);
+
       setIsLoggedIn(true);
-      setUser(savedUser);
+      setUser(user);
       await storage.saveUserSession();
 
       return {
         status: true,
         message: LABELS.login_successful,
-        user: savedUser,
+        user,
       };
     } catch (error) {
       return {
@@ -120,16 +134,26 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
       name,
       email,
       password,
+      isLoggedIn = false,
     }: {
       name: string;
       email: string;
       password: string;
+      isLoggedIn: boolean;
     }) => {
       try {
-        const newUser: User = { name, email };
+        const newUser: User = { name, email, password, isLoggedIn };
 
-        await storage.saveUserDetails(newUser);
-        await storage.saveEncryptedPassword(password);
+        const existingUsersRaw = await storage.getUserDetails();
+        const existingUsers = Array.isArray(existingUsersRaw)
+          ? existingUsersRaw
+          : [];
+
+        const updatedUsers = [...existingUsers, newUser];
+
+        await storage.saveUserDetails(updatedUsers);
+
+        await storage.saveEncryptedPassword(email, password);
 
         return {
           status: true,
@@ -154,14 +178,16 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
   }, []);
 
   const getCurrentSession = useCallback(async () => {
-    const session = await storage.getUserSession();
     const savedUser = await storage.getUserDetails();
-
-    const isLoggedIn = session?.isLoggedIn === true;
+    const loggedInUser: User = savedUser.find(
+      (user: User) => user.isLoggedIn === true,
+    );
+    setUser(loggedInUser);
+    const isLoggedIn = loggedInUser?.isLoggedIn === true;
 
     return {
       isLoggedIn,
-      user: isLoggedIn ? savedUser : null,
+      user: loggedInUser,
     };
   }, []);
 

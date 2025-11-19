@@ -29,6 +29,7 @@ export const storage = {
 
   saveUserDetails: async (user: any) => {
     try {
+      console.log("USERRRRRRR saveUserDetails",user)
       await AsyncStorage.setItem(STORAGE_KEYS.USER, JSON.stringify(user));
     } catch (err) {
       console.error('Error saving user details:', err);
@@ -38,6 +39,7 @@ export const storage = {
   getUserDetails: async () => {
     try {
       const user = await AsyncStorage.getItem(STORAGE_KEYS.USER);
+      console.log("USERRRRRRR getUserDetails",user)
       return user ? JSON.parse(user) : null;
     } catch (err) {
       console.error('Error loading user details:', err);
@@ -45,10 +47,10 @@ export const storage = {
     }
   },
 
-  saveEncryptedPassword: async (password: string) => {
+  saveEncryptedPassword: async (email:string,password: string) => {
     try {
       await EncryptedStorage.setItem(
-        STORAGE_KEYS.PASSWORD,
+        email,
         password 
       );
     } catch (err) {
@@ -56,9 +58,9 @@ export const storage = {
     }
   },
 
-  getEncryptedPassword: async () => {
+  getEncryptedPassword: async (email:string) => {
     try {
-      return await EncryptedStorage.getItem(STORAGE_KEYS.PASSWORD);
+      return await EncryptedStorage.getItem(email);
     } catch (err) {
       console.error('Error fetching encrypted password:', err);
       return null;

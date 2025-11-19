@@ -8,7 +8,7 @@ import AppScreen from './AppScreen';
 
 const HomeScreen: React.FC = () => {
   const { user, logout } = useContext(AuthContext);
-
+console.log("HomeScreen",user)
   return (
     <AppScreen>
       <View style={styles.container}>

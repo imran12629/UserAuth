@@ -2,6 +2,7 @@ import React, {
   forwardRef,
   useImperativeHandle,
   useRef,
+  useState,
 } from 'react';
 import {
   TextInput,
@@ -11,6 +12,8 @@ import {
   Text,
   ViewStyle,
   useWindowDimensions,
+  TouchableOpacity,
+  Image,
 } from 'react-native';
 import { COLORS } from '../../utils/constants';
 import {
@@ -35,6 +38,7 @@ type Props = {
   LeftIcon?: any;
   RightIcon?: any;
   onPress?: () => void;
+  secureTextEntry?:boolean;
 } & React.ComponentProps<typeof TextInput>;
 
 const Input = forwardRef<InputRef, Props>((props, ref) => {
@@ -42,6 +46,7 @@ const Input = forwardRef<InputRef, Props>((props, ref) => {
   const isLandscape = width > height;
 
   const inputRef = useRef<TextInput>(null);
+  const [hidePassword, setHidePassword] = useState(props.secureTextEntry);
 
   useImperativeHandle(ref, () => ({
     focus: () => inputRef.current?.focus(),
@@ -54,6 +59,10 @@ const Input = forwardRef<InputRef, Props>((props, ref) => {
     if (props.errorMessage) return styles.errorBorder;
     if (props.status === 'success') return styles.successBorder;
     return styles.defaultBorder;
+  };
+
+  const togglePasswordVisibility = () => {
+    setHidePassword(prev => !prev);
   };
 
   return (
@@ -74,7 +83,21 @@ const Input = forwardRef<InputRef, Props>((props, ref) => {
           placeholderTextColor={COLORS.darkGray}
           editable={props.editable}
           {...props}
+          secureTextEntry={hidePassword}
         />
+       {props.secureTextEntry && (
+          <TouchableOpacity onPress={togglePasswordVisibility}  >
+           <Image
+              source={
+                !hidePassword
+                  ? require('../../assets/icons/eye.png')
+                  : require('../../assets/icons/eye-off.png')
+              }
+              style={styles.eye}
+              resizeMode="contain"
+            />
+          </TouchableOpacity>
+        )}
       </View>
 
       {props.errorMessage ? (
@@ -117,8 +140,13 @@ const styles = StyleSheet.create({
     color: COLORS.darkBlue,
     height: verticalScale(48),
   },
+  eye:
+  {
+    width:moderateScale(30),
+    height:moderateScale(30)
+  },
   errorText: {
-    marginTop: 4,
+    marginTop: verticalScale(4),
     fontSize: scaleFont(11),
     color: COLORS.red,
   },
